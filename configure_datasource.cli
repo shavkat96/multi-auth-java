@@ -1,0 +1,21 @@
+connect localhost:9990
+
+#Add postgresql dbdriver
+module add \
+    --name=org.postgresql \
+    --resources=d:/postgresql.jar \
+    --dependencies=javax.api,javax.transaction.api
+
+/subsystem=datasources/jdbc-driver=postgres:add(name=PostgresDS, driver-name=postgres, driver-module-name=org.postgresql, driver-class-name=org.postgresql.Driver)
+
+#Add datasources to the jndi context in the appserver
+data-source add \
+    --name=PostgresDS
+    --jndi-name=java:jboss/datasources/PostgresDS \
+    --connection-url=jdbc:postgresql://localhost:5432/auth \
+    --user-name=postgres \
+    --password=admin
+
+/subsystem=undertow/server=default-server/http-listener=default:write-attribute(name=max-post-size, value=31457280)
+
+reload

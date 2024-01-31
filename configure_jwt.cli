@@ -1,0 +1,16 @@
+/subsystem=elytron/key-store=jwt-key-store:add(type="PKCS12", relative-to="jboss.server.config.dir", path="jwt.keystore", credential-reference={clear-text="secret"})
+
+/subsystem=elytron/key-store=jwt-key-store:generate-key-pair(alias=jwt-auth, algorithm=RSA, key-size=2048, validity=365, credential-reference={clear-text=secret}, distinguished-name="CN=localhost")
+
+/subsystem=elytron/key-store=jwt-key-store:store
+
+/subsystem=elytron/token-realm=jwt-realm:add(jwt={issuer=["jwt-issuer"], audience=["jwt-audience"], key-store=jwt-key-store, certificate="jwt-auth"}, principal-claim="sub")
+
+/subsystem=elytron/security-domain=jwt-security-domain:add(realms=[{realm=jwt-realm, role-decoder=groups-to-roles}], permission-mapper=default-permission-mapper, default-realm=jwt-realm)
+
+/subsystem=elytron/http-authentication-factory=jwt-http-authentication:add(security-domain=jwt-security-domain, http-server-mechanism-factory=global, mechanism-configurations=[{mechanism-name="BEARER_TOKEN", mechanism-realm-configurations=[{realm-name="jwt-realm"}]}])
+
+batch
+/subsystem=undertow/application-security-domain=other:undefine-attribute(name=security-domain)
+/subsystem=undertow/application-security-domain=other:write-attribute(name=http-authentication-factory, value=jwt-http-authentication)
+run-batch
