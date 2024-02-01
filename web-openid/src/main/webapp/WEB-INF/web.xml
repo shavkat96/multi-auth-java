@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<web-app xmlns="http://xmlns.jcp.org/xml/ns/javaee"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/web-app_4_0.xsd"
+         version="4.0">
+    <security-constraint>
+        <web-resource-collection>
+            <web-resource-name>Home Page</web-resource-name>
+            <url-pattern>/home</url-pattern>
+            <url-pattern>/api/protected</url-pattern>
+        </web-resource-collection>
+        <auth-constraint>
+            <role-name>OAuthUser</role-name>
+        </auth-constraint>
+    </security-constraint>
+    <security-role>
+        <role-name>OAuthUser</role-name>
+    </security-role>
+    <login-config>
+        <auth-method>BEARER_TOKEN</auth-method>
+        <realm-name>oauth2-realm</realm-name>
+    </login-config>
+    <session-config>
+        <session-timeout>
+            30
+        </session-timeout>
+    </session-config>
+</web-app>
