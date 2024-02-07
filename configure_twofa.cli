@@ -1,0 +1,5 @@
+/subsystem=elytron/jdbc-realm=twofa-realm:add(principal-query=[{sql="SELECT PASSWORD FROM USERS WHERE USERNAME = ?", data-source="PostgresDS", clear-password-mapper={password-index=1}},{sql="SELECT R.NAME, 'Roles' FROM TWOFA_ROLES TR INNER JOIN ROLES R ON R.ID = TR.ROLE_ID INNER JOIN USERS U ON U.ID = TR.USER_ID WHERE U.USERNAME = ?", data-source="PostgresDS", attribute-mapping=[{index=1, to=Roles}]}])
+
+/subsystem=elytron/security-domain=twofa-security-domain:add(default-realm=twofa-realm, realms=[{realm=twofa-realm}], permission-mapper=default-permission-mapper, outflow-security-domains=[business-security-domain])
+
+/subsystem=undertow/application-security-domain=TwofaDomain:add(security-domain=twofa-security-domain)

@@ -1,0 +1,16 @@
+# Create a Client SSLContext
+/subsystem=elytron/key-store=oauth-key-store:add(type="PKCS12", relative-to="jboss.server.config.dir", path="oauth.keystore", credential-reference={clear-text="secret"})
+
+/subsystem=elytron/trust-manager=default-trust-manager:add(algorithm=PKIX, key-store=oauth-key-store)
+
+/subsystem=elytron/client-ssl-context=default-client-ssl-context:add(trust-manager=default-trust-manager)
+
+
+# Create the realm
+/subsystem=elytron/token-realm=oauth2-realm:add(principal-claim="sub", oauth2-introspection={client-id="514809554910-2itsnr8fve4u6fi4mft51ch23v0q8vn4.apps.googleusercontent.com", client-secret="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", client-ssl-context=default-client-ssl-context, introspection-url="https://www.googleapis.com/oauth2/v3/tokeninfo"})
+
+/subsystem=elytron/security-domain=oauth-security-domain:add(realms=[{realm=oauth2-realm, role-decoder=groups-to-roles}], permission-mapper=default-permission-mapper, default-realm=oauth2-realm)
+
+/subsystem=elytron/http-authentication-factory=oauth-http-authentication:add(security-domain=oauth-security-domain, http-server-mechanism-factory=global, mechanism-configurations=[{mechanism-name="BEARER_TOKEN", mechanism-realm-configurations=[{realm-name="oauth2-realm"}]}])
+
+/subsystem=undertow/application-security-domain=OAuthDomain:add(http-authentication-factory=oauth-http-authentication)
